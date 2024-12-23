@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import os
 
+
 # Load model dari file model_svm.pkl
 with open('./model/best_rf_model.pkl', 'rb') as file:
     model = pickle.load(file)
@@ -29,6 +30,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Membuat folder ./data jika belum ada
+if not os.path.exists('./data'):
+    os.makedirs('./data')
+
 # Fungsi untuk reset input
 def reset_input():
     st.session_state['Age'] = 0.0
@@ -47,11 +52,12 @@ if 'reset' not in st.session_state:
 if st.button('Reset'):
     reset_input()
     st.session_state['reset'] = True
+    st.success("Data telah direset!")
 
 # Input dari pengguna sesuai urutan yang benar
 Age = st.number_input('Masukkan nilai untuk Age:', value=st.session_state.get('Age', 0.0), key='Age')
 Pulse_pressure = st.number_input('Masukkan nilai untuk Pulse pressure:', value=st.session_state.get('Pulse pressure', 0.0), key='Pulse pressure')
-Systolic_BP = st.number_input('Masukkan nilai untuk Systolic_BP:', value=st.session_state.get('Systolic BP', 0.0), key='Systolic BP')
+Systolic_BP = st.number_input('Masukkan nilai untuk Systolic BP:', value=st.session_state.get('Systolic BP', 0.0), key='Systolic BP')
 Diastolic_BP = st.number_input('Masukkan nilai untuk Diastolic BP:', value=st.session_state.get('Diastolic BP', 0.0), key='Diastolic BP')
 Serum_Cholesterol = st.number_input('Masukkan nilai untuk Serum Cholesterol:', value=st.session_state.get('Serum Cholesterol', 0.0), key='Serum Cholesterol')
 Sedimentation_rate = st.number_input('Masukkan nilai untuk Sedimentation rate:', value=st.session_state.get('Sedimentation rate', 0.0), key='Sedimentation rate')
@@ -92,10 +98,10 @@ if st.button('Predict'):
     # Simpan data input dan hasil prediksi ke file CSV
     save_input_and_prediction_to_csv(input_data, prediction)
 
-    # Tampilkan hasil prediksi
+    # Tampilkan hasil prediksi dengan alert streamlit
     if prediction[0] == 1.0:
-        st.write('Hasil Prediksi: **Beresiko Kematian** 10 tahun kedepan')
+        st.success('Hasil Prediksi: **Beresiko Kematian** 10 tahun kedepan')
     elif prediction[0] == 0.0:
-        st.write('Hasil Prediksi: **Tidak Beresiko Kematian**')
+        st.success('Hasil Prediksi: **Tidak Beresiko Kematian**')
     else:
-        st.write('Hasil Prediksi: Nilai prediksi tidak valid.')
+        st.warning('Hasil Prediksi: Nilai prediksi tidak valid.')
