@@ -1,20 +1,22 @@
-import pickle
 import streamlit as st
 import pandas as pd
+from model_utils import load_model, save_input_and_prediction_to_csv, make_prediction
 import os
 
+# Load model
+model = load_model()
 
-# Load model dari file model_svm.pkl
-with open('./model/best_rf_model.pkl', 'rb') as file:
-    model = pickle.load(file)
+# Streamlit Application
+# st.title('DecAI Prognosis: Predicting the 10-Year Risk of Mortality')
 
-# Aplikasi Streamlit
-st.title('DecAI Prognosis: Predicting the 10-Year Risk of Mortality')
-
-# CSS untuk membuat desain hitam putih dan tombol hitam
+# CSS for dark theme
 st.markdown(
     """
     <style>
+    body {
+        background-color: #121212;
+        color: #ffffff;
+    }
     .stButton>button {
         background-color: #000000;
         color: #FFFFFF;
@@ -25,62 +27,77 @@ st.markdown(
         background-color: #333333;
         color: #FFFFFF;
     }
+    .stNumberInput>div>input {
+        background-color: #1E1E1E;
+        color: #FFFFFF;
+    }
+
     </style>
     """,
     unsafe_allow_html=True
 )
+st.markdown(
+    """
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <h1 style='font-family: Roboto, sans-serif; text-align: center; color: #33AFFF;'>
+        DecAI Prognosis
+    </h1>
+    <p style='text-align: center; color: #ffffff;'>Predicting the 10-Year Risk of Mortality</p>
+    """,
+    unsafe_allow_html=True
+)
 
-# Membuat folder ./data jika belum ada
+# Create ./data folder if it doesn't exist
 if not os.path.exists('./data'):
     os.makedirs('./data')
 
-# Fungsi untuk reset input
+# Function to reset inputs
+# Function to reset input values
 def reset_input():
-    st.session_state['Age'] = 0.0
-    st.session_state['Pulse pressure'] = 0.0
-    st.session_state['Systolic BP'] = 0.0
-    st.session_state['Diastolic BP'] = 0.0
-    st.session_state['Serum Cholesterol'] = 0.0
-    st.session_state['Sedimentation rate'] = 0.0
-    st.session_state['Sex'] = 0.0
-    st.session_state['Serum Albumin'] = 0.0
+    st.session_state['Age'] = 0
+    st.session_state['Pulse pressure'] = 0
+    st.session_state['Systolic BP'] = 0
+    st.session_state['Diastolic BP'] = 0
+    st.session_state['Serum Cholesterol'] = 0
+    st.session_state['Sedimentation rate'] = 0
+    st.session_state['Sex'] = 'Male'  # Set to a valid option
+    st.session_state['Serum Albumin'] = 0
 
-# Tombol Reset ditekan
+# Reset button
 if 'reset' not in st.session_state:
     st.session_state['reset'] = False
 
 if st.button('Reset'):
     reset_input()
     st.session_state['reset'] = True
-    st.success("Data telah direset!")
-
-# Input dari pengguna sesuai urutan yang benar
-Age = st.number_input('Masukkan nilai untuk Age:', value=st.session_state.get('Age', 0.0), key='Age')
-Pulse_pressure = st.number_input('Masukkan nilai untuk Pulse pressure:', value=st.session_state.get('Pulse pressure', 0.0), key='Pulse pressure')
-Systolic_BP = st.number_input('Masukkan nilai untuk Systolic BP:', value=st.session_state.get('Systolic BP', 0.0), key='Systolic BP')
-Diastolic_BP = st.number_input('Masukkan nilai untuk Diastolic BP:', value=st.session_state.get('Diastolic BP', 0.0), key='Diastolic BP')
-Serum_Cholesterol = st.number_input('Masukkan nilai untuk Serum Cholesterol:', value=st.session_state.get('Serum Cholesterol', 0.0), key='Serum Cholesterol')
-Sedimentation_rate = st.number_input('Masukkan nilai untuk Sedimentation rate:', value=st.session_state.get('Sedimentation rate', 0.0), key='Sedimentation rate')
-Sex = st.number_input('Masukkan nilai untuk Sex:', value=st.session_state.get('Sex', 0.0), key='Sex')
-Serum_Albumin = st.number_input('Masukkan nilai untuk Serum Albumin:', value=st.session_state.get('Serum Albumin', 0.0), key='Serum Albumin')
+    st.success("Inputs have been reset!")
 
 
-# Fungsi untuk menyimpan data input dan hasil prediksi ke file CSV
-def save_input_and_prediction_to_csv(data, prediction, filename='./data/inputs_predictions.csv'):
-    # Tambahkan kolom hasil prediksi ke DataFrame
-    data['Prediction'] = prediction
 
-    # Periksa apakah file sudah ada
-    if not os.path.isfile(filename):
-        # Jika belum, buat file baru dengan header
-        data.to_csv(filename, index=False)
-    else:
-        # Jika sudah ada, tambahkan data tanpa menimpa header
-        data.to_csv(filename, mode='a', header=False, index=False)
+# User inputs with units
+Age = st.number_input('Enter value for Age (years):', value=st.session_state.get('Age', 0), key='Age')
+Pulse_pressure = st.number_input('Enter value for Pulse pressure (mmHg):', value=st.session_state.get('Pulse pressure', 0), key='Pulse pressure')
+Systolic_BP = st.number_input('Enter value for Systolic BP (mmHg):', value=st.session_state.get('Systolic BP', 0), key='Systolic BP')
+Diastolic_BP = st.number_input('Enter value for Diastolic BP (mmHg):', value=st.session_state.get('Diastolic BP', 0), key='Diastolic BP')
+Serum_Cholesterol = st.number_input('Enter value for Serum Cholesterol (mg/dL):', value=st.session_state.get('Serum Cholesterol', 0), key='Serum Cholesterol')
+Sedimentation_rate = st.number_input('Enter value for Sedimentation rate (mm/hr):', value=st.session_state.get('Sedimentation rate', 0), key='Sedimentation rate')
 
-# Tombol Predict
+# Gender selection
+Sex = st.radio(
+    'Select gender:',
+    options=['Male', 'Female'],
+    index=0 if st.session_state.get('Sex', 'Male') == 'Male' else 1,
+    key='Sex'
+)
+# Map the values for the model
+Sex = 1 if Sex == 'Male' else 2
+
+Serum_Albumin = st.number_input('Enter value for Serum Albumin (g/dL):', value=st.session_state.get('Serum Albumin', 0), key='Serum Albumin')
+
+
+# Predict button
 if st.button('Predict'):
-    # Buat DataFrame dari input pengguna sesuai dengan urutan fitur saat pelatihan
+    # Create a DataFrame from user inputs matching the feature order during training
     input_data = pd.DataFrame({
         'Age': [Age],
         'Pulse pressure': [Pulse_pressure],
@@ -92,16 +109,18 @@ if st.button('Predict'):
         'Serum Albumin': [Serum_Albumin],
     })
 
-    # Prediksi menggunakan model yang sudah diload
-    prediction = model.predict(input_data)
+    # Make prediction using the model
+    prediction = make_prediction(model, input_data)
     
-    # Simpan data input dan hasil prediksi ke file CSV
+    # Save user inputs and prediction result to CSV file
     save_input_and_prediction_to_csv(input_data, prediction)
 
-    # Tampilkan hasil prediksi dengan alert streamlit
+    # Display prediction result with a Streamlit alert
     if prediction[0] == 1.0:
-        st.success('Hasil Prediksi: **Beresiko Kematian** 10 tahun kedepan')
+        st.success('Prediction Result: **At Risk of Mortality** in the next 10 years')
     elif prediction[0] == 0.0:
-        st.success('Hasil Prediksi: **Tidak Beresiko Kematian**')
+        st.success('Prediction Result: **Not at Risk of Mortality**')
     else:
-        st.warning('Hasil Prediksi: Nilai prediksi tidak valid.')
+        st.warning('Prediction Result: Invalid prediction value.')
+
+
