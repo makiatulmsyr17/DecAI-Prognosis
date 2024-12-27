@@ -1,5 +1,4 @@
 import pickle
-import pandas as pd
 import os
 
 # Load model dari file model_svm.pkl
