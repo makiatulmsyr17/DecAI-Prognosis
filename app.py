@@ -39,15 +39,13 @@ st.markdown(
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
-    <img src="image/logo.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
     <h1 style='font-family: Roboto, sans-serif; text-align: center; color: #33AFFF;'>
-         DecAI Prognosis🩺
+        🩺DecAI Prognosis🩺
     </h1>
     <p style='text-align: center; color: #ffffff;'>Predicting the 10-Year Risk of Mortality</p>
     """,
     unsafe_allow_html=True
 )
-
 
 # Create ./data folder if it doesn't exist
 if not os.path.exists('./data'):
@@ -55,6 +53,8 @@ if not os.path.exists('./data'):
 
 # Function to reset inputs
 # Function to reset input values
+
+
 def reset_input():
     st.session_state['Age'] = 0
     st.session_state['Pulse pressure'] = 0
@@ -64,6 +64,7 @@ def reset_input():
     st.session_state['Sedimentation rate'] = 0
     st.session_state['Sex'] = 'Male'  # Set to a valid option
     st.session_state['Serum Albumin'] = 0
+
 
 # Reset button
 if 'reset' not in st.session_state:
@@ -87,17 +88,19 @@ if st.session_state['reset']:
     st.session_state['reset'] = False
     reset_message_placeholder.empty()
 
-
-
-
-
 # User inputs with units
-Age = st.number_input('Enter value for Age (years):', value=st.session_state.get('Age', 0), key='Age')
-Pulse_pressure = st.number_input('Enter value for Pulse pressure (mmHg):', value=st.session_state.get('Pulse pressure', 0), key='Pulse pressure')
-Systolic_BP = st.number_input('Enter value for Systolic BP (mmHg):', value=st.session_state.get('Systolic BP', 0), key='Systolic BP')
-Diastolic_BP = st.number_input('Enter value for Diastolic BP (mmHg):', value=st.session_state.get('Diastolic BP', 0), key='Diastolic BP')
-Serum_Cholesterol = st.number_input('Enter value for Serum Cholesterol (mg/dL):', value=st.session_state.get('Serum Cholesterol', 0), key='Serum Cholesterol')
-Sedimentation_rate = st.number_input('Enter value for Sedimentation rate (mm/hr):', value=st.session_state.get('Sedimentation rate', 0), key='Sedimentation rate')
+Age = st.number_input('Enter value for Age (years):',
+                      value=st.session_state.get('Age', 0), key='Age')
+Pulse_pressure = st.number_input('Enter value for Pulse pressure (mmHg):',
+                                 value=st.session_state.get('Pulse pressure', 0), key='Pulse pressure')
+Systolic_BP = st.number_input('Enter value for Systolic BP (mmHg):',
+                              value=st.session_state.get('Systolic BP', 0), key='Systolic BP')
+Diastolic_BP = st.number_input('Enter value for Diastolic BP (mmHg):',
+                               value=st.session_state.get('Diastolic BP', 0), key='Diastolic BP')
+Serum_Cholesterol = st.number_input('Enter value for Serum Cholesterol (mg/dL):',
+                                    value=st.session_state.get('Serum Cholesterol', 0), key='Serum Cholesterol')
+Sedimentation_rate = st.number_input('Enter value for Sedimentation rate (mm/hr):',
+                                     value=st.session_state.get('Sedimentation rate', 0), key='Sedimentation rate')
 
 # Gender selection
 Sex = st.radio(
@@ -109,7 +112,8 @@ Sex = st.radio(
 # Map the values for the model
 Sex = 1 if Sex == 'Male' else 2
 
-Serum_Albumin = st.number_input('Enter value for Serum Albumin (g/dL):', value=st.session_state.get('Serum Albumin', 0), key='Serum Albumin')
+Serum_Albumin = st.number_input('Enter value for Serum Albumin (g/dL):',
+                                value=st.session_state.get('Serum Albumin', 0), key='Serum Albumin')
 
 
 # Predict button
@@ -128,16 +132,26 @@ if st.button('Predict'):
 
     # Make prediction using the model
     prediction = make_prediction(model, input_data)
-    
+
     # Save user inputs and prediction result to CSV file
     save_input_and_prediction_to_csv(input_data, prediction)
 
     # Display prediction result with a Streamlit alert
     if prediction[0] == 1.0:
-        st.success('Prediction Result: **At Risk of Mortality** in the next 10 years')
+        st.success(
+            'Prediction Result: **At Risk of Mortality** in the next 10 years')
     elif prediction[0] == 0.0:
         st.success('Prediction Result: **Not at Risk of Mortality**')
     else:
         st.warning('Prediction Result: Invalid prediction value.')
 
-
+# Footer for copyright
+st.markdown(
+    """
+    <hr style="border: 1px solid #333;">
+    <p style="text-align: center; color: #AAAAAA; font-size: 12px;">
+        © 2024 Garuda Insight. All rights reserved.
+    </p>
+    """,
+    unsafe_allow_html=True
+)
