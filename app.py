@@ -40,7 +40,7 @@ st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
     <h1 style='font-family: Roboto, sans-serif; text-align: center; color: #33AFFF;'>
-        DecAI Prognosis
+        🩺DecAI Prognosis🩺
     </h1>
     <p style='text-align: center; color: #ffffff;'>Predicting the 10-Year Risk of Mortality</p>
     """,
@@ -67,10 +67,25 @@ def reset_input():
 if 'reset' not in st.session_state:
     st.session_state['reset'] = False
 
-if st.button('Reset'):
-    reset_input()
-    st.session_state['reset'] = True
-    st.success("Inputs have been reset!")
+# Placeholder for reset message
+reset_message_placeholder = st.empty()
+
+# Reset button in the right column
+col1, col2 = st.columns([9, 1])  # Adjust the proportions as needed
+with col2:
+    if st.button('🔄', help="Click to reset inputs"):
+        reset_input()
+        st.session_state['reset'] = True
+        reset_message_placeholder.success("Inputs have been reset!")
+
+# Clear reset message after a delay (optional)
+if st.session_state['reset']:
+    import time
+    time.sleep(2)  # Delay in seconds
+    st.session_state['reset'] = False
+    reset_message_placeholder.empty()
+
+
 
 
 
