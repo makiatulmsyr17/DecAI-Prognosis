@@ -39,13 +39,15 @@ st.markdown(
 st.markdown(
     """
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <img src="image/logo.png" alt="Logo" style="width: 50px; height: 50px; vertical-align: middle; margin-right: 10px;">
     <h1 style='font-family: Roboto, sans-serif; text-align: center; color: #33AFFF;'>
-        🩺DecAI Prognosis🩺
+         DecAI Prognosis🩺
     </h1>
     <p style='text-align: center; color: #ffffff;'>Predicting the 10-Year Risk of Mortality</p>
     """,
     unsafe_allow_html=True
 )
+
 
 # Create ./data folder if it doesn't exist
 if not os.path.exists('./data'):
