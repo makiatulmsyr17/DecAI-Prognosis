@@ -8,7 +8,7 @@ def load_model(model_path='./model/best_rf_model.pkl'):
     return model
 
 # Fungsi untuk menyimpan data input dan hasil prediksi ke file CSV
-def save_input_and_prediction_to_csv(data, prediction, filename='./data/inputs_predictions.csv'):
+def save_input_and_prediction_to_csv(data, prediction, filename='https://drive.google.com/file/d/1gtZ3zJLc5o5vxZddgoXsv6vu4UllSJve/view?usp=sharing'):
     # Tambahkan kolom hasil prediksi ke DataFrame
     data['Prediction'] = prediction
 
