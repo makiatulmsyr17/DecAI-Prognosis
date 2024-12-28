@@ -87,4 +87,6 @@ For questions or feedback, please contact:
 - **Developer**: Makiatul Musyaropah
 - **Email**: makiatulmusyaropah@gmail.com
 
+## Link deployment
+https://decaiprognosis.streamlit.app/
 
